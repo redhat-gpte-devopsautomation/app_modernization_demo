@@ -2,10 +2,15 @@
 
 == Overview
 
-== Provisioning
+====
+TBD
+====
+
+== Provisioning the demo environment
 
 . Log into RHPDS (https://rhpds.redhat.com)
 . Request the catalog item *OpenShift 4 App Modernization Demo* from the catalog *OpenShift Demos*.
+.. For now make sure you switch to the second page and select *DEV* as the environment.
 +
 The deployment will take about 90 minutes.
 . Take note of the information in the e-mail you receive.
@@ -60,6 +65,10 @@ The deployment will take about 90 minutes.
 ----
 
 == Explore the environment
+
+====
+TBD
+====
 
 == Migrate the Oracle VM from RHEV to OpenShift
 
@@ -240,25 +249,55 @@ In the future we will have a trigger and event listener on the pipeline. But for
 . Click the dots menu to the right of the pipeline `customers-deployment-pipeline` and select *Start last run*
 
 
+== Appendix
 
+=== Recover a locked Oracle database user (customer)
 
-== Recover a Oracle database user (customer) that is locked:
+If the customer application can not connect to the Oracle database because the Oracle user is locked you can follow this procedure to unlock the customer user in Oracle.
 
+. From your bastion VM connect to the Oracle VM
++
 [source,sh]
 ----
-virtctl console oracle-wkama
+virtctl console oracle-${GUID}
+----
 
+. Switch to the `oracle` user:
++
+[source,sh]
+----
 sudo -i
 su - oracle
-sqlplus sys/redhat@//10.0.2.2:1521/XE as sysdba
+----
 
-sqlplus sys/redhat@//10.0.2.2:1521/XEPDB1 as sysdba
+. Determine the current IP Address of your Oracle VM pod
++
+[source,sh]
+----
+ip address | grep inet | grep -v 127 | grep -v inet6
+----
 
+. Use the previously determined IP Address to connect to the Oracle Database. Replace `ORACLE_ADMIN_PASSWORD` with the Oracle admin password from your welcome e-mail.
++
+[source,sh]
+----
+sqlplus sys/ORACLE_ADMIN_PASSWORD@//10.0.2.2:1521/XEPDB1 as sysdba
+----
+
+. Fix the locked user:
++
+[source,sh]
+----
 SQL> conn customer as sysdba
 SQL> select account_status, lock_date from dba_users where username = 'CUSTOMER';
 SQL> alter user customer account unlock;
-
-logout of everything. Then Ctrl-] to disconnect.
 ----
+
+. Logout of everything by pressing `Ctrl-D` repeatedly until you are at the VM login screen.
+. Press `Ctrl-]` to disconnect from the virtctl console.
+
+Your customer pod should now be able to connect to your Oracle VM pod.
+
+=== Possible future extension to the VSCode Server workload
 
 Existing Role: https://github.com/ansible/workshops/blob/f1a5ac477558f9834391df90445970a6ad0f118e/roles/code_server/tasks/codeserver.yml#L68
