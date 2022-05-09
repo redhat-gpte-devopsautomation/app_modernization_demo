@@ -1,0 +1,264 @@
+= OpenShift Application Modernization Demo
+
+== Overview
+
+== Provisioning
+
+. Log into RHPDS (https://rhpds.redhat.com)
+. Request the catalog item *OpenShift 4 App Modernization Demo* from the catalog *OpenShift Demos*.
++
+The deployment will take about 90 minutes.
+. Take note of the information in the e-mail you receive.
++
+.Example e-mail:
+[source,text]
+----
+- "Openshift Console: https://console-openshift-console.apps.cluster-wkama.wkama.devel.opentlc.com"
+- "Openshift API for command line 'oc' client: https://api.cluster-wkama.wkama.devel.opentlc.com:6443"
+- "Download oc client from http://d3s3zqyaz8cp2d.cloudfront.net/pub/openshift-v4/clients/ocp/stable-4.10/openshift-client-linux.tar.gz"
+- ""
+- "HTPasswd Authentication is enabled on this cluster."
+- "Users user1 .. user2 are created with password `xxxxxxxxxxxx`"
+- "User `admin` with password `xxxxxxxxxxxx` is cluster admin."
+- "You can access Gitea via the URL https://gitea.apps.cluster-wkama.wkama.devel.opentlc.com"
+- "The Gitea admin username is 'opentlc-mgr'."
+- "The Gitea admin password is 'xxxxxxxxxxxx'."
+- "A Gitea user 'lab-user' was created, with the password 'xxxxxxxxxxxx'"
+- "The following repositories were migrated for the created users:"
+- "https://github.com/wkulhanek/appmod-enablement"
+- ""
+- "Migration Toolkit for Applications:"
+- "  URL:      https://secure-mta-web-console-openshift-mta.apps.cluster-wkama.wkama.devel.opentlc.com"
+- "  User:     mta"
+- "  Password: xxxxxxxxxxxx"
+- ""
+- "Red Hat Enterprise Virtualization Properties:"
+- "  URL:      https://rhvm.dev.cnv.infra.opentlc.com"
+- "  Hostname: rhvm.dev.cnv.infra.opentlc.com"
+- "  User:     migrateuser-wkama@internal"
+- "  Password: xxxxxxxxxxxx"
+- ""
+- "Customer Service (Tomcat VM)"
+- "  VM Name:     tomcat-wkama"
+- "  IP Address:  xxx.xxx.xxx.xxx"
+- "  User:        migrateuser-wkama"
+- "  Password:    xxxxxxxxxxxx"
+- ""
+- "Oracle Database VM (on RHEV):"
+- "  VM Name:     oracle-wkama"
+- "  IP Address:  xxx.xxx.xxx.xxx"
+- "  User ID:     lab-user"
+- "  VM Password: xxxxxxxxxxxx"
+- ""
+- "  SSH Command: ssh lab-user@xxx.xxx.xxx.xxx"
+- ""
+- "Oracle Database:"
+- "  Database: customer"
+- "  User: customer"
+- "  Password: xxxxxxxxxxxx"
+- "  Admin Password: xxxxxxxxxxxx"
+----
+
+== Explore the environment
+
+== Migrate the Oracle VM from RHEV to OpenShift
+
+=== Prerequisites
+
+. Download the CA Certificate for your RHEV environment:
++
+[source,sh]
+----
+wget -O $HOME/pki-resource.cer --no-check-certificate "https://rhvm.dev.cnv.infra.opentlc.com/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA"
+----
+
+. Or if you prefer the web browser:
+.. Navigate to `https://RHEV_HOSTNAME/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA` in your web browser (replace RHEV_HOSTNAMEA with the hostname from your welcome e-mail - e.g. `rhvm.dev.cnv.infra.opentlc.com`).
+.. On most systems this will download a file `pki-resource.cer` into your `Downloads` folder.
+.. Take a note where this file got downloaded to. You will need it a little bit later.
+
+=== Set up Virtualization Provider in MTV
+
+. Log into the OpenShift Web Console using the URL and admin credentials provided
+. On the left click on *Virtualization* -> *Virtual Machines*
+. From the *Projects* drop down select the *retail* project.
+.. There are no Virtual Machines yet.
+. Click *Launch Migration Tool* to launch the OpenShift Migration Toolkit for Virtualization.
+. Log in using your admin credentials
+. On the list of *Providers* click *Add provider*
+. Select *Red Hat Virtualization* from the list of providers. Fill in the information from your e-mail:
+.. *Name*: `rhev`
+.. *RHV Manager host name or IP address*: The hostname from your e-mail. For example `rhvm.dev.cnv.infra.opentlc.com`
+.. *RHV Manager user name*: the username from your e-mail. For example `migrateuser-wkama@internal`
+.. *RHV Manager passsword*: the password from yoru e-mail. For example `niIEPihdCR7I`
+.. *CA Certificate*: Drop the previously downloaded CA Certificate File
+.. Click *Add*.
+. MTV will validate your provider and after a few seconds the status should switch to *Ready*.
+
+=== Create and execute Migration Plan
+
+. In the *Migration Toolkit for Virtualization* console navigate to *Migration Plans*.
+. Click *Create Plan*
+. On the *General* page use the following parameters:
+.. *Plan name*: `oracle-database`
+.. *Source provider*: select the *rhev* source provider you previously created
+.. *Target provider*: select *host* (the OpenShift cluster you are currently on)
+.. *Target namespace*: select *retail*
+. Click *Next*
+. On the *VM Selection / Filter* page select the checkbox next to *All datacenters*
+. Click *Next*
+. On the *VM Selection / Select VMs* page select the VM that got created for you. You will find the name in your welcome e-mail (future). The name will be something like *oracle-XXXXX* where XXXXX is your GUID.
+. Click *Next*
+. On the *Network Mapping* page click on *Select a network mapping* and select *Create a network mapping*.
+. Leave the defaults and click *Next*
+. On the *Storage Mapping* page click on *Select a storage mapping* and select *Create a storage mapping*.
+. Leave the defaults and click *Next*
+. On the *Type* page leave the default and click *Next*
+. On the *Hooks* page click *Next*
+. On the *Review* page click *Finish*
+
+Now your Migration Plan is ready to use. To execute the plan click the *Start* button next to your *oracle-database* migration plan and confirm by clicking the blue *Start* button in the popup window.
+
+The migration will take about 15-25 minutes after which you will have a VM in your OpenShift cluster.
+
+Once the migration succeeds you will find a VM called `oracle-xxxxx` in your retail namespace.
+
+Optional: 
+Unfortunately the migration shuts down the VM in Red Hat Enterprise Virtualization. Therefore it is necessary to start the machine again after it has been migrated.
+
+=== Post Migration Tasks:
+
+The VM is not yet reachable from other applications on the cluster. You will need to add a label to the VM and then create a service to be able to connect to the database on the VM.
+
+. Add a label to your VM's template metadata. Replace `oracle-wkama` with the name of your VM.
++
+[source,sh]
+----
+oc patch vm oracle-wkama --type=merge --patch='{"spec": { "template": { "metadata": { "labels": { "app": "oracle-wkama"}}}}}' -n retail
+----
+
+. Navigate to your VM in the OpenShift Web Console:
+.. *Virtualization* -> *VirtualMachines*
+.. Click on your VM
+. Restart the VM for the VM Pod to pick up the new label.
+.. From the *Action* drop down select *Restart* then confirm by clicking *Restart* in the pop up dialog.
+
+////
+. Download virtctl:
++
+[source,sh]
+----
+oc get consoleclidownload virtctl-clidownloads-kubevirt-hyperconverged -o yaml
+
+wget https://hyperconverged-cluster-cli-download-openshift-cnv.apps.cluster-wk.dynamic.opentlc.com/amd64/linux/virtctl.tar.gz
+
+tar -xvzf virtctl.tar.gz
+rm virtctl.tar.gz
+sudo chown root:root virtctl
+sudo mv virtctl /usr/bin
+----
+
+. Restart VM
++
+[source,sh]
+----
+virtctl restart oracle-wkama -n retail
+----
+////
+
+. Create service for database vm:
++
+[source,sh]
+----
+oc create service clusterip oracle-wkama --tcp=1521:1521 --tcp=2022:22 -n retail
+----
+
+. Make sure your service has the endpoint for the Oracle VM pod as an Endpoint:
++
+[source,sh]
+----
+oc describe svc oracle-wkama -n retail
+----
++
+.Sample Output
+[source,texinfo]
+----
+Name:              oracle-wkama
+Namespace:         retail
+Labels:            app=oracle-wkama
+Annotations:       <none>
+Selector:          app=oracle-wkama
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                172.30.4.130
+IPs:               172.30.4.130
+Port:              1521-1521  1521/TCP
+TargetPort:        1521/TCP
+Endpoints:         10.128.1.14:1521
+Port:              2022-22  2022/TCP
+TargetPort:        22/TCP
+Endpoints:         10.128.1.14:22
+Session Affinity:  None
+Events:            <none>
+----
+
+== Change Customer Application to connect to the migrated VM on the cluster
+
+The existing customer pod connects to the VM running in RHEV. Unless you started the VM again in RHEV this application now has no database. But since we migrated the VM over to OpenShift we need to tell the application to connect to the VM on OpenShift instead.
+
+You will need to change source code in order to point to the VM.
+
+. In a web browser navigate to the Visual Studio Code window at http://bastion.wkama.devel.opentlc.com:8443.
+. Navigate to the file `appmod-enablement / customer-tomcat-gitops / helm / secret / persistence.properties`
+. Change the *jdbc.url* to use the service name for your VM on OpenShift. It should look somewhat like this:
++
+[source,text]
+----
+jdbc.url=jdbc:oracle:thin:@oracle-wkama:1521/xepdb1
+----
+
+. Save the file.
+
+. Configure Git: in VSCode switch to the Terminal and run these two commands:
++
+[source,sh]
+----
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+----
+
+. Switch to the Source Control section in VSCode, commit and push the change.
+(you may need to push from the Terminal. It will prompt for user (lab-user) and password (openshift))
+
+== Kick off Pipeline run
+
+In the future we will have a trigger and event listener on the pipeline. But for now you have to kick off the pipeline run manually
+
+. Log into OpenShift Web Console
+. Navigate to *Pipelines* -> *Pipelines*
+. Click the dots menu to the right of the pipeline `customers-deployment-pipeline` and select *Start last run*
+
+
+
+
+== Recover a Oracle database user (customer) that is locked:
+
+[source,sh]
+----
+virtctl console oracle-wkama
+
+sudo -i
+su - oracle
+sqlplus sys/redhat@//10.0.2.2:1521/XE as sysdba
+
+sqlplus sys/redhat@//10.0.2.2:1521/XEPDB1 as sysdba
+
+SQL> conn customer as sysdba
+SQL> select account_status, lock_date from dba_users where username = 'CUSTOMER';
+SQL> alter user customer account unlock;
+
+logout of everything. Then Ctrl-] to disconnect.
+----
+
+Existing Role: https://github.com/ansible/workshops/blob/f1a5ac477558f9834391df90445970a6ad0f118e/roles/code_server/tasks/codeserver.yml#L68
