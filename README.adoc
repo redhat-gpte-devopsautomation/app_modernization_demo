@@ -314,11 +314,11 @@ Once the migration succeeds you will find a VM called `oracle-xxxxx` in your ret
 
 The VM is not yet reachable from other applications on the cluster. You will need to add a label to the VM and then create a service to be able to connect to the database on the VM.
 
-. Add a label to your VM's template metadata.
+. Add a label to your VM's template metadata (make sure to replace `wkama` with your GUID).
 +
 [source,sh]
 ----
-oc patch vm oracle-${GUID} --type=merge --patch='{"spec": { "template": { "metadata": { "labels": { "app": "oracle-${GUID}"}}}}}' -n retail
+oc patch vm oracle-wkama --type=merge --patch='{"spec": { "template": { "metadata": { "labels": { "app": "oracle-wkama"}}}}}' -n retail
 ----
 
 . Restart the VM for the VM Pod to pick up the new label.
@@ -387,7 +387,7 @@ The existing customer pod connects to the VM running in RHEV. Unless you started
 
 You will need to change source code in order to point to the VM.
 
-. In a web browser navigate to the Visual Studio Code window at http://bastion.wkama.devel.opentlc.com:8443.
+. In a web browser navigate to the Visual Studio Code window using the URL and password from your welcome e-mail.
 . Navigate to the file `appmod-enablement / customer-tomcat-gitops / helm / secret / persistence.properties`
 . Change the *jdbc.url* to use the service name for your VM on OpenShift. It should look somewhat like this:
 +
