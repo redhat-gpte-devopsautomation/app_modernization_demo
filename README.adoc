@@ -15,64 +15,69 @@ TBD
 .. For now make sure you switch to the second page and select *DEV* as the environment.
 +
 The deployment will take about 90 minutes.
-. Take note of the information in the e-mail you receive.
+. Take note of the information in the e-mail you receive. It will look similar to the example below (note that all passwords have been obfuscated from this example).
 +
-.Example e-mail (To be replace with actual e-mail text):
+.Example e-mail:
 [source,text]
 ----
-- "Openshift Console: https://console-openshift-console.apps.cluster-wkama.wkama.devel.opentlc.com"
-- "Openshift API for command line 'oc' client: https://api.cluster-wkama.wkama.devel.opentlc.com:6443"
-- "Download oc client from http://d3s3zqyaz8cp2d.cloudfront.net/pub/openshift-v4/clients/ocp/stable-4.10/openshift-client-linux.tar.gz"
-- ""
-- "HTPasswd Authentication is enabled on this cluster."
-- "Users user1 .. user2 are created with password `xxxxxxxxxxxx`"
-- "User `admin` with password `xxxxxxxxxxxx` is cluster admin."
-- "You can access Gitea via the URL https://gitea.apps.cluster-wkama.wkama.devel.opentlc.com"
-- "The Gitea admin username is 'opentlc-mgr'."
-- "The Gitea admin password is 'xxxxxxxxxxxx'."
-- "A Gitea user 'lab-user' was created, with the password 'xxxxxxxxxxxx'"
-- "The following repositories were migrated for the created users:"
-- "https://github.com/wkulhanek/appmod-enablement"
-- ""
-- "Migration Toolkit for Applications:"
-- "  URL:      https://secure-mta-web-console-openshift-mta.apps.cluster-wkama.wkama.devel.opentlc.com"
-- "  User:     mta"
-- "  Password: xxxxxxxxxxxx"
-- ""
-- "Red Hat Enterprise Virtualization Properties:"
-- "  URL:      https://rhvm.dev.cnv.infra.opentlc.com"
-- "  Hostname: rhvm.dev.cnv.infra.opentlc.com"
-- "  User:     migrateuser-wkama@internal"
-- "  Password: xxxxxxxxxxxx"
-- ""
-- "Customer Service (Tomcat VM)"
-- "  VM Name:     tomcat-wkama"
-- "  IP Address:  xxx.xxx.xxx.xxx"
-- "  User:        migrateuser-wkama"
-- "  Password:    xxxxxxxxxxxx"
-- ""
-- "Oracle Database VM (on RHEV):"
-- "  VM Name:     oracle-wkama"
-- "  IP Address:  xxx.xxx.xxx.xxx"
-- "  User ID:     lab-user"
-- "  VM Password: xxxxxxxxxxxx"
-- ""
-- "  SSH Command: ssh lab-user@xxx.xxx.xxx.xxx"
-- ""
-- "Oracle Database:"
-- "  Database: customer"
-- "  User: customer"
-- "  Password: xxxxxxxxxxxx"
-- "  Admin Password: xxxxxxxxxxxx"
-- ""
-- "Visual Studio Code Server is available on the Bastion VM."
-- "  URL:      https://bastion.amawk.amawk.devel.opentlc.com:8443"
-- "  Password: xxxxxxxxxxxx"
-- ""
-- "You can access your bastion via SSH:"
-- "ssh wkulhane-redhat.com@bastion.amawk.devel.opentlc.com"
-- ""
-- "Make sure you use the username 'wkulhane-redhat.com' and the password 'xxxxxxxxx' when prompted."
+Openshift Console: https://console-openshift-console.apps.cluster-2xj7m.sandbox37.opentlc.com
+Openshift API for command line 'oc' client: https://api.cluster-2xj7m.sandbox37.opentlc.com:6443
+Download oc client from http://d3s3zqyaz8cp2d.cloudfront.net/pub/openshift-v4/clients/ocp/stable-4.10/openshift-client-linux.tar.gz
+
+HTPasswd Authentication is enabled on this cluster.
+Users user1 .. user1 are created with password `xxxxxxxx`
+User `admin` with password `xxxxxxxxx` is cluster admin.
+You can access Gitea via the URL https://gitea.apps.cluster-2xj7m.sandbox37.opentlc.com
+The Gitea admin username is 'opentlc-mgr'.
+The Gitea admin password is 'xxxxxxxx'.
+A Gitea user 'lab-user' was created, with the password 'xxxxxxxx'
+The following repositories were migrated for the created users:
+https://github.com/rromannissen/appmod-enablement
+
+Migration Toolkit for Applications:
+  URL:      https://secure-mta-web-console-openshift-mta.apps.cluster-2xj7m.sandbox37.opentlc.com
+  User:     mta
+  Password: xxxxxxxx
+
+Konveyor Tackle (Migration Toolkit for Applications Upstream):
+  URL:      https://tackle-tackle.apps.cluster-2xj7m.sandbox37.opentlc.com
+  User:     tackle
+  Password: xxxxxxxx
+
+Red Hat Enterprise Virtualization Properties:
+  URL:      https://rhvm.dev.cnv.infra.opentlc.com
+  Hostname: rhvm.dev.cnv.infra.opentlc.com
+  User:     migrateuser-2xj7m@internal
+  Password: xxxxxxxx
+
+Customer Service (Tomcat VM)
+  VM Name:     tomcat-2xj7m
+  IP Address:  169.60.225.222
+  User:        migrateuser-2xj7m
+  Password:    xxxxxxxx
+
+Oracle Database VM (on RHEV):
+  VM Name:     oracle-2xj7m
+  IP Address:  169.60.225.221
+  User ID:     lab-user
+  VM Password: xxxxxxxx
+
+  SSH Command: ssh lab-user@169.60.225.221
+
+Oracle Database:
+  Database: customer
+  User: customer
+  Password: xxxxxxxx
+  Admin Password: xxxxxxxx
+
+Visual Studio Code Server is available on the Bastion VM.
+  URL:      https://bastion.2xj7m.sandbox37.opentlc.com:8443
+  Password: xxxxxxxx
+
+You can access your bastion via SSH:
+ssh wkulhane-redhat.com@bastion.2xj7m.sandbox37.opentlc.com
+
+Make sure you use the username 'wkulhane-redhat.com' and the password 'xxxxxxxxxx' when prompted.
 ----
 
 == Explore the environment
@@ -376,7 +381,7 @@ Events:            <none>
 == Modernize Customer Java Application
 
 ====
-TBD
+TBD: https://github.com/deewhyweb/app-modernization-workshop
 ====
 
 == Use OpenShift Pipelines to build and deploy the modernized customer application.
