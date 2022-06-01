@@ -44,11 +44,13 @@ Konveyor Tackle (Migration Toolkit for Applications Upstream):
   User:     tackle
   Password: xxxxxxxx
 
-Red Hat Enterprise Virtualization Properties:
-  URL:      https://rhvm.dev.cnv.infra.opentlc.com
-  Hostname: rhvm.dev.cnv.infra.opentlc.com
-  User:     migrateuser-2xj7m@internal
-  Password: xxxxxxxx
+Red Hat Virtualization Properties:
+  URL:          https://rhvm.dev.cnv.infra.opentlc.com
+  Hostname:     rhvm.dev.cnv.infra.opentlc.com
+  User:         migrateuser-2xj7m
+  Profile:      internal
+  User for MTV: migrateuser-2xj7m@internal
+  Password:     xxxxxxxx
 
 Customer Service (Tomcat VM)
   VM Name:     tomcat-2xj7m
